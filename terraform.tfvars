@@ -1,0 +1,7 @@
+aws_region="us-east-1"
+aws_profile="default"
+image_repo_name="trailplanner"
+source_repo_name="trailplanner"
+source_repo_branch="main"
+source_repo_owner="ivanfermena"
+stack="terraform-trailplanner"
