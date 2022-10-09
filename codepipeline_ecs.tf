@@ -61,13 +61,24 @@ resource "aws_iam_role_policy_attachment" "codepipeline-attach" {
 # Artifact store s3 bucket
 
 resource "aws_s3_bucket" "artifact_bucket" {
+    bucket        = "codepipeline-artifacts-container"
+  acl           = "private"
+  force_destroy = true
+
+  lifecycle_rule {
+    enabled = true
+
+    expiration {
+      days = 5
+    }
+  }
 }
 
 # AWS Codepipeline
 
-resource "aws_codepipeline" "pipeline" {
+resource "aws_codepipeline" "pipeline-container" {
   depends_on = [
-    aws_codebuild_project.codebuild
+    aws_codebuild_project.codebuild_container
   ]
   name     = "${var.source_repo_name}-${var.source_repo_branch}-Pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
@@ -96,7 +107,7 @@ resource "aws_codepipeline" "pipeline" {
   }
 
   stage {
-    name = "Build"
+    name = "BuildContainer"
     action {
       name             = "Build"
       category         = "Build"
@@ -107,13 +118,13 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = ["BuildOutput"]
       run_order        = 1
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild.id
+        ProjectName = aws_codebuild_project.codebuild_container.id
       }
     }
   }
 
   stage {
-    name = "Deploy"
+    name = "DeployContainer"
     action {
       name            = "Deploy"
       category        = "Deploy"
@@ -133,6 +144,6 @@ resource "aws_codepipeline" "pipeline" {
 }
 
 output "pipeline_url" {
-  value = "https://console.aws.amazon.com/codepipeline/home?region=${var.aws_region}#/view/${aws_codepipeline.pipeline.id}"
+  value = "https://console.aws.amazon.com/codepipeline/home?region=${var.aws_region}#/view/${aws_codepipeline.pipeline-container.id}"
 }
 

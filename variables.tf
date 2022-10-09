@@ -72,6 +72,11 @@ variable "source_repo_name" {
     type = string
 }
 
+variable "source_lambdas_repo_name" {
+    description = "Source lambdas repo name"
+    type = string
+}
+
 variable "source_repo_branch" {
     description = "Source repo branch"
     type = string
