@@ -58,24 +58,24 @@ resource "aws_ecs_task_definition" "task-def" {
         },
     "environment": [
             {
-                "name": "spring.datasource.username",
+                "name": "POSTGRES_USER",
                 "value": "${var.db_user}"
             },
             {
-                "name": "spring.datasource.password",
+                "name": "POSTGRES_PASSWORD",
                 "value": "${var.db_password}"
             },
             {
-                "name": "spring.datasource.initialize",
-                "value": "${var.db_initialize}"
+                "name": "POSTGRES_PORT",
+                "value": "${var.db_port}"
             },
             {
-                "name": "spring.profiles.active",
-                "value": "${var.db_profile}"
+                "name": "POSTGRES_HOST",
+                "value": "${aws_db_instance.db.address}"
             },
             {
-                "name": "spring.datasource.url",
-                "value": "jdbc:mysql://${aws_db_instance.db.address}/${var.db_name}"
+                "name": "POSTGRES_DB",
+                "value": "${var.db_name}"
             }
     ],
     "portMappings": [

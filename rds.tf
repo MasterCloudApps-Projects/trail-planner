@@ -27,7 +27,7 @@ resource "aws_db_instance" "db" {
   allocated_storage = 5
   engine            = "postgres"
   engine_version    = "13.7"
-  port              = "3306"
+  port              = "5432"
   instance_class    = var.db_instance_type
   db_name           = var.db_name
   username          = var.db_user
@@ -54,5 +54,5 @@ output "db_port" {
 }
 
 output "db_url" {
-  value = "jdbc:mysql://${aws_db_instance.db.address}/${var.db_name}"
+  value = aws_db_instance.db.address
 }

@@ -111,9 +111,9 @@ variable "db_profile" {
   default     = "postgres"
 }
 
-variable "db_initialize" {
-  description = "RDS initialize"
-  default     = "yes"
+variable "db_port" {
+  description = "RDS port"
+  default     = 5432
 }
 
 variable "db_instance_type" {
@@ -128,7 +128,7 @@ variable "db_name" {
 
 variable "db_user" {
   description = "RDS DB username"
-  default     = "root"
+  default     = "postgres"
 }
 
 variable "db_password" {

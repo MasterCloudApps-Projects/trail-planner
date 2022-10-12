@@ -61,7 +61,7 @@ resource "aws_iam_role_policy_attachment" "codepipeline-attach" {
 # Artifact store s3 bucket
 
 resource "aws_s3_bucket" "artifact_bucket" {
-    bucket        = "codepipeline-artifacts-container"
+  bucket        = "codepipeline-artifacts-container"
   acl           = "private"
   force_destroy = true
 
