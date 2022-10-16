@@ -83,7 +83,7 @@ resource "aws_codebuild_project" "codebuild_container" {
     type = "CODEPIPELINE"
   }
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
+    compute_type                = "BUILD_GENERAL1_MEDIUM"
     image                       = "aws/codebuild/standard:3.0"
     type                        = "LINUX_CONTAINER"
     privileged_mode             = true

@@ -134,3 +134,15 @@ variable "db_user" {
 variable "db_password" {
   description = "RDS DB password"
 }
+
+variable "terraform_ver" {
+    description = "Terraform Version number for passing it to codebuild"
+    default     = "1.2.2"
+    type        = string
+}
+
+variable "env_namespace" {
+    description = "Namespace env deply lambdas"
+    default     = "trailplanner-dev"
+    type        = string
+}
