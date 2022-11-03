@@ -21,7 +21,7 @@ phases:
       - echo Build started on `date`
       - terraform --version
       - echo Updating ENV_namespace in terraform.tfvars
-      - cat terraform.tfvars | hclq set 'env_namespace' $ENV_NAMESPACE | hclq set 'ecr_repo_url' $REPO_URI | hclq set 'ecr_repo_arn' $REPO_ARN | tee terraform.tfvars
+      - cat terraform.tfvars | hclq set 'env_namespace' $ENV_NAMESPACE | hclq set 'ecr_repo_url' $REPO_URI | hclq set 'ecr_repo_arn' $REPO_ARN | hclq set 'rds_host' $RDS_HOST | hclq set 'rds_db_username' $RDS_DB_USERNAME | hclq set 'rds_db_password' $RDS_DB_PASSWORD | hclq set 'rds_db_name' $RDS_DB_NAME | hclq set 'subnet_id' $SUBNET_ID | hclq set 'sg_id' $LAMBDA_SG_ID | tee terraform.tfvars
       - terraform init -input=false
       - terraform validate
       - terraform apply -auto-approve

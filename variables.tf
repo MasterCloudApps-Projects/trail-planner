@@ -30,50 +30,20 @@ variable "image_repo_name" {
 
 # ECS
 
-variable "task_count" {
-  description = "Number of ECS tasks to run"
-  default     = 1
-}
-
 variable "container_port" {
   description = "Port exposed by the docker image to redirect traffic to"
   default     = 8080
 }
 
-variable "fargate_cpu" {
-  description = "Fargate instance CPU units to provision (1 vCPU = 1024 CPU units)"
-  default     = "512"
-}
-
-variable "fargate_memory" {
-  description = "Fargate instance memory to provision (in MiB)"
-  default     = "1024"
-}
-
-variable "cw_log_group" {
-  description = "CloudWatch Log Group"
-  default     = "TrailPlanner"
-}
-
-variable "cw_log_stream" {
-  description = "CloudWatch Log Stream"
-  default     = "fargate"
-}
-
-variable "fargate-task-service-role" {
-  description = "Name of the stack."
-  default     = "terraform-role-fargate-trailplanner"
-}
-
 # Repo name and branch
 
-variable "source_repo_name" {
+variable "source_backend_repo_name" {
     description = "Source repo name"
     type = string
 }
 
-variable "source_lambdas_repo_name" {
-    description = "Source lambdas repo name"
+variable "source_lambda_repo_name" {
+    description = "Source lambda repo name"
     type = string
 }
 

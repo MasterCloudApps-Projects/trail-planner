@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "tasks-service-role-attachment" {
 # ECS SERVICE
 # ---------------------------------------------------------------------------------------------------------------------
 
-resource "aws_ecs_task_definition" "task-def" {
+resource "aws_ecs_task_definition" "task-def-backend" {
   family                   = var.family
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -44,7 +44,7 @@ resource "aws_ecs_task_definition" "task-def" {
 [
   {
     "cpu": ${var.fargate_cpu},
-    "image": "${aws_ecr_repository.image_repo.repository_url}",
+    "image": "${aws_ecr_repository.backend_repo.repository_url}",
     "memory": ${var.fargate_memory},
     "name": "${var.family}",
     "networkMode": "awsvpc",
@@ -71,7 +71,7 @@ resource "aws_ecs_task_definition" "task-def" {
             },
             {
                 "name": "POSTGRES_HOST",
-                "value": "${aws_db_instance.db.address}"
+                "value": "${var.db_url}"
             },
             {
                 "name": "POSTGRES_DB",
@@ -92,25 +92,21 @@ DEFINITION
 resource "aws_ecs_service" "service" {
   name            = "${var.stack}-Service"
   cluster         = aws_ecs_cluster.ecs-cluster.id
-  task_definition = aws_ecs_task_definition.task-def.arn
+  task_definition = aws_ecs_task_definition.task-def-backend.arn
   desired_count   = var.task_count
   force_new_deployment = true
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups = [aws_security_group.task-sg.id]
-    subnets         = aws_subnet.private.*.id
+    security_groups = [var.aws_security_group.task-sg.id]
+    subnets         = var.aws_subnet.private.*.id
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.trgp.id
+    target_group_arn = var.aws_alb_target_id
     container_name   = var.family
     container_port   = var.container_port
   }
-
-  depends_on = [
-    aws_alb_listener.alb-listener,
-  ]
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

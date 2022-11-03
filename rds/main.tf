@@ -5,7 +5,7 @@
 resource "aws_db_subnet_group" "db-subnet-grp" {
   name        = "trailplanner-db-sgrp"
   description = "Database Subnet Group"
-  subnet_ids  = aws_subnet.private.*.id
+  subnet_ids  = var.aws_subnet.private.*.id
 }
 
 resource "aws_db_parameter_group" "bd-parameter-group" {
@@ -33,26 +33,10 @@ resource "aws_db_instance" "db" {
   username          = var.db_user
   password          = var.db_password
   availability_zone      = "${var.aws_region}a"
-  vpc_security_group_ids = [aws_security_group.db-sg.id]
+  vpc_security_group_ids = [var.aws_security_group.db-sg.id]
   multi_az               = false
   db_subnet_group_name   = aws_db_subnet_group.db-subnet-grp.id
   parameter_group_name   = aws_db_parameter_group.bd-parameter-group.name
   publicly_accessible    = false
   skip_final_snapshot    = true
-
-  tags = {
-    Name = "${var.stack}-db"
-  }
-}
-
-output "db_host" {
-  value = aws_db_instance.db.address
-}
-
-output "db_port" {
-  value = aws_db_instance.db.port
-}
-
-output "db_url" {
-  value = aws_db_instance.db.address
 }
