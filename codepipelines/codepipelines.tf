@@ -38,6 +38,22 @@ resource "aws_codepipeline" "codepipeline-backend" {
   }
 
   stage {
+    name = "BuildTestsContainer"
+    action {
+      name             = "Build"
+      category         = "Build"
+      owner            = "AWS"
+      version          = "1"
+      provider         = "CodeBuild"
+      input_artifacts  = ["SourceOutput"]
+      run_order        = 1
+      configuration = {
+        ProjectName = aws_codebuild_project.codebuild_backend[0].id
+      }
+    }
+  }
+
+  stage {
     name = "BuildContainer"
     action {
       name             = "Build"
@@ -49,7 +65,7 @@ resource "aws_codepipeline" "codepipeline-backend" {
       output_artifacts = ["BuildOutput"]
       run_order        = 1
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_backend.id
+        ProjectName = aws_codebuild_project.codebuild_backend[1].id
       }
     }
   }

@@ -1,12 +1,16 @@
 locals {
   projects  = ["build", "deploy"]
+  backend   = ["pre_build", "build"]
 }
 
 # Codebuild container project
 
 resource "aws_codebuild_project" "codebuild_backend" {
-  name          = "codebuild-backend"
+  count         = length(local.backend)
+  name          = "codebuild-backend-${local.backend[count.index]}"
+  badge_enabled = false
   service_role  = aws_iam_role.codebuild_container_role.arn
+
   artifacts {
     type = "CODEPIPELINE"
   }
@@ -36,7 +40,7 @@ resource "aws_codebuild_project" "codebuild_backend" {
 
   source {
         type      = "CODEPIPELINE"
-        buildspec = file("${path.module}/templates/backend/buildspec_${local.projects[0]}.yml")
+        buildspec = file("${path.module}/templates/backend/buildspec_${local.backend[count.index]}.yml")
   }
 }
 
