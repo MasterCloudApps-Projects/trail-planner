@@ -67,8 +67,10 @@ module codepipelines {
   rds_db_name = var.db_name
   rds_db_password = var.db_password
   rds_db_username = var.db_user
-  lambda_sg = module.network.security_groups
+  rds_db_port = var.db_port
+  security_groups = module.network.security_groups
   subnet = module.network.aws_subnet
+  vpc_id = module.network.aws_vpc_id
 }
 
 

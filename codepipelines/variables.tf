@@ -70,6 +70,10 @@ variable "rds_db_password" {
   description = ""
 }
 
+variable "rds_db_port" {
+  description = ""
+}
+
 variable "rds_db_name" {
   description = ""
 }
@@ -78,7 +82,11 @@ variable "subnet" {
   description = ""
 }
 
-variable "lambda_sg" {
+variable "vpc_id" {
+  description = ""
+}
+
+variable "security_groups" {
   description = ""
 }
 

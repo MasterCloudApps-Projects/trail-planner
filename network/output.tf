@@ -18,6 +18,10 @@ output "aws_subnet" {
   }
 }
 
+output "aws_vpc_id" {
+  value = aws_vpc.main.id
+}
+
 output "aws_alb_target_id" {
   value = aws_alb_target_group.trgp.id
 }

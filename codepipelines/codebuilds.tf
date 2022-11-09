@@ -14,6 +14,14 @@ resource "aws_codebuild_project" "codebuild_backend" {
   artifacts {
     type = "CODEPIPELINE"
   }
+  vpc_config {
+    vpc_id = var.vpc_id
+
+    subnets = var.subnet.private[*].id
+
+    security_group_ids = [var.security_groups.task-sg.id]
+  }
+
   environment {
     compute_type                = "BUILD_GENERAL1_MEDIUM"
     image                       = "aws/codebuild/standard:3.0"
@@ -35,6 +43,26 @@ resource "aws_codebuild_project" "codebuild_backend" {
     environment_variable {
       name = "AWS_ACCOUNT_ID"
       value = var.account_id
+    }
+    environment_variable {
+      name = "RDS_HOST"
+      value = var.rds_host
+    }
+    environment_variable {
+      name = "RDS_DB_USERNAME"
+      value = var.rds_db_username
+    }
+    environment_variable {
+      name = "RDS_DB_NAME"
+      value = var.rds_db_name
+    }
+    environment_variable {
+      name = "RDS_DB_PASSWORD"
+      value = var.rds_db_password
+    }
+    environment_variable {
+      name = "RDS_DB_PORT"
+      value = var.rds_db_port
     }
   }
 
@@ -105,7 +133,7 @@ resource "aws_codebuild_project" "codebuild_lambdas" {
     }
     environment_variable {
       name = "LAMBDA_SG_ID"
-      value = var.lambda_sg.lambda-sg.id
+      value = var.security_groups.lambda-sg.id
     }
   }
 
