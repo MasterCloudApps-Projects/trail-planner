@@ -87,22 +87,16 @@ resource "aws_security_group" "db-sg" {
   }
 }
 
-resource "aws_security_group" "lambda-sg" {
-  name        = "${var.stack}-lambda-sg"
-  description = "Allow inbound access to lambda tasks"
-  vpc_id      = aws_vpc.main.id
+resource "aws_security_group" "pre_build-sg" {
+  name   = "build"
+  vpc_id = aws_vpc.main.id
+}
 
-  ingress {
-    protocol        = "-1"
-    from_port       = 0
-    to_port         = 0
-    security_groups = [aws_security_group.alb-sg.id]
-  }
-
-  egress {
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "pre_build_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.pre_build-sg.id
 }

@@ -2,14 +2,6 @@ variable "image_backend_url" {
   description = ""
 }
 
-variable "image_lambda_url" {
-  description = ""
-}
-
-variable "image_lambda_arn" {
-  description = ""
-}
-
 variable "image_backend_arn" {
   description = ""
 }
@@ -51,10 +43,6 @@ variable "stack" {
 }
 
 variable "source_backend_repo_name" {
-  description = ""
-}
-
-variable "source_lambda_repo_name" {
   description = ""
 }
 

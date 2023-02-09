@@ -7,7 +7,7 @@ output "security_groups" {
     db-sg = aws_security_group.db-sg
     task-sg = aws_security_group.task-sg
     alb-sg = aws_security_group.alb-sg
-    lambda-sg = aws_security_group.lambda-sg
+    pre_build-sg = aws_security_group.pre_build-sg
   }
 }
 

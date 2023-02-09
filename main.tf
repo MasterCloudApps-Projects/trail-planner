@@ -50,15 +50,12 @@ module codepipelines {
   ]
   image_backend_url = module.ecs.image_backend_url
   image_backend_arn = module.ecs.image_backend_arn
-  image_lambda_url = module.ecs.image_lambda_url
-  image_lambda_arn  = module.ecs.image_lambda_arn
   aws_region        = var.aws_region
   family            = var.family
   account_id        = data.aws_caller_identity.current.account_id
   env_namespace     = var.env_namespace
   terraform_ver     = var.terraform_ver
   source_backend_repo_name = var.source_backend_repo_name
-  source_lambda_repo_name = var.source_lambda_repo_name
   source_repo_branch = var.source_repo_branch
   source_repo_github_token = var.source_repo_github_token
   source_repo_owner = var.source_repo_owner

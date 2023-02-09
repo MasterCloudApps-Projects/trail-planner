@@ -26,8 +26,25 @@ resource "aws_iam_policy" "codebuild_container_policy" {
   "Statement": [
     {
       "Action": [
-        "logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents",
-        "ecr:GetAuthorizationToken"
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeDhcpOptions",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeVpcs",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:CompleteLayerUpload",
+                "ecr:GetAuthorizationToken",
+                "ecr:InitiateLayerUpload",
+                "ecr:PutImage",
+                "ecr:UploadLayerPart",
+                "ecs:RunTask",
+                "iam:PassRole",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "ssm:GetParameters"
       ],
       "Effect": "Allow",
       "Resource": "*"
@@ -37,7 +54,7 @@ resource "aws_iam_policy" "codebuild_container_policy" {
         "s3:GetObject", "s3:GetObjectVersion", "s3:PutObject"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.codepipeline_bucket.arn}/*"
+      "Resource": ["${aws_s3_bucket.codepipeline_bucket.arn}/*", "${aws_s3_bucket.codepipeline_bucket.arn}"]
     },
     {
       "Action": [
@@ -57,6 +74,21 @@ resource "aws_iam_policy" "codebuild_container_policy" {
       ],
       "Effect": "Allow",
       "Resource": "${var.image_backend_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateNetworkInterfacePermission"
+      ],
+      "Resource": "arn:aws:ec2:${var.aws_region}:*:network-interface/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:AuthorizedService": "codebuild.amazonaws.com"
+        },
+        "ArnEquals": {
+          "ec2:Subnet": ["${var.subnet.private[0].arn}", "${var.subnet.private[1].arn}"]
+        }
+      }
     }
   ]
 }
@@ -124,141 +156,4 @@ EOF
 resource "aws_iam_role_policy_attachment" "codepipeline-attach" {
   role       = aws_iam_role.codepipeline_role.name
   policy_arn = aws_iam_policy.codepipeline_policy.arn
-}
-
-resource "aws_iam_role" "lambda_codepipeline_role" {
-  name = "${var.env_namespace}_codepipeline_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codepipeline.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy" "lambda_codepipeline_policy" {
-  name = "Lambda_codepipeline_policy"
-  role = aws_iam_role.lambda_codepipeline_role.id
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect":"Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetBucketVersioning",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.codepipeline_bucket.arn}",
-        "${aws_s3_bucket.codepipeline_bucket.arn}/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "codebuild:*",
-        "codecommit:*"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role" "lambda_codebuild_role" {
-  name               = "Lambda_codebuild_role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codebuild.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy" "lambda_codebuild_role_policy" {
-  role   = aws_iam_role.lambda_codebuild_role.name
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Resource": [
-        "*"
-      ],
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "sts:AssumeRole",
-        "codebuild:*",
-        "lambda:*",
-        "iam:AddRoleToInstanceProfile",
-        "iam:AttachRolePolicy",
-        "iam:CreateInstanceProfile",
-        "iam:CreatePolicy",
-        "iam:CreateRole",
-        "iam:GetRole",
-        "iam:ListAttachedRolePolicies",
-        "iam:ListPolicies",
-        "iam:ListRolePolicies",
-        "iam:ListRoles",
-        "iam:PassRole",
-        "iam:PutRolePolicy",
-        "iam:UpdateAssumeRolePolicy",
-        "iam:GetRolePolicy"
-
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Resource": ["${var.image_lambda_arn}"],
-      "Action": [
-        "ecr:*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Resource": [
-        "*"
-      ],
-      "Action": [
-        "ecr:GetAuthorizationToken"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:*"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.codepipeline_bucket.arn}",
-        "${aws_s3_bucket.codepipeline_bucket.arn}/*"
-      ]
-    }
-  ]
-}
-POLICY
 }

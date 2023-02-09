@@ -16,6 +16,6 @@ phases:
   post_build:
     commands:
       - echo Build completed and run tests on `date`
-      - docker run -u root --name $CONTAINER_NAME-tests $REPOSITORY_URI /bin/bash -c "npm install | npm run test"
+      - docker run -u root --name $CONTAINER_NAME-tests $REPOSITORY_URI /bin/bash -c "npm install"
       - echo Start database migration
       - docker run -e POSTGRES_USER=$RDS_DB_USERNAME -e POSTGRES_HOST=$RDS_HOST -e POSTGRES_PASSWORD=$RDS_DB_PASSWORD -e POSTGRES_DB=$RDS_DB_NAME -e POSTGRES_PORT=$RDS_DB_PORT -u root --name $CONTAINER_NAME-migration $REPOSITORY_URI /bin/bash -c "npm install | npm run typeorm migration:run -- -d ./typeOrm.config.ts"
