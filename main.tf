@@ -22,6 +22,15 @@ module "rds" {
   db_user            = var.db_user
 }
 
+module elasticBeanstalk {
+  source = "./elasticBeanstalk"
+  depends_on = [
+    module.network
+  ]
+  subnet = module.network.aws_subnet
+  vpc_id = module.network.aws_vpc_id
+}
+
 module ecs {
   source = "./ecs"
   depends_on = [
@@ -46,7 +55,8 @@ module ecs {
 module codepipelines {
   source = "./codepipelines"
   depends_on = [
-    module.ecs
+    module.ecs,
+    module.elasticBeanstalk
   ]
   image_backend_url = module.ecs.image_backend_url
   image_backend_arn = module.ecs.image_backend_arn
@@ -56,6 +66,7 @@ module codepipelines {
   env_namespace     = var.env_namespace
   terraform_ver     = var.terraform_ver
   source_backend_repo_name = var.source_backend_repo_name
+  source_frontend_repo_name = var.source_frontend_repo_name
   source_repo_branch = var.source_repo_branch
   source_repo_github_token = var.source_repo_github_token
   source_repo_owner = var.source_repo_owner
@@ -68,6 +79,6 @@ module codepipelines {
   security_groups = module.network.security_groups
   subnet = module.network.aws_subnet
   vpc_id = module.network.aws_vpc_id
+  elastic_beanstalk_app     = module.elasticBeanstalk.elastic_beanstalk_app
+  elastic_beanstalk_app_env = module.elasticBeanstalk.elastic_beanstalk_app_env
 }
-
-

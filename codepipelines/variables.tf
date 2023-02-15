@@ -46,6 +46,10 @@ variable "source_backend_repo_name" {
   description = ""
 }
 
+variable "source_frontend_repo_name" {
+  description = ""
+}
+
 variable "rds_host" {
   description = ""
 }
@@ -78,3 +82,10 @@ variable "security_groups" {
   description = ""
 }
 
+variable "elastic_beanstalk_app" {
+  description = ""
+}
+
+variable "elastic_beanstalk_app_env" {
+  description = ""
+}

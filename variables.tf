@@ -42,7 +42,7 @@ variable "source_backend_repo_name" {
     type = string
 }
 
-variable "source_lambda_repo_name" {
+variable "source_frontend_repo_name" {
     description = "Source lambda repo name"
     type = string
 }

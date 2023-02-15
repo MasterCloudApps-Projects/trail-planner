@@ -126,7 +126,9 @@ resource "aws_iam_policy" "codepipeline_policy" {
   "Statement": [
     {
       "Action": [
-        "s3:GetObject", "s3:GetObjectVersion", "s3:PutObject",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:PutObject",
         "s3:GetBucketVersioning"
       ],
       "Effect": "Allow",
@@ -134,7 +136,8 @@ resource "aws_iam_policy" "codepipeline_policy" {
     },
     {
       "Action" : [
-        "codebuild:StartBuild", "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:BatchGetBuilds",
         "cloudformation:*",
         "iam:PassRole"
       ],

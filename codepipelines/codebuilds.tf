@@ -1,12 +1,12 @@
 locals {
-  backend   = ["pre_build", "build"]
+  steps   = ["pre_build", "build"]
 }
 
-# Codebuild container project
+# Codebuild backend container project
 
 resource "aws_codebuild_project" "codebuild_backend" {
-  count         = length(local.backend)
-  name          = "codebuild-backend-${local.backend[count.index]}"
+  count         = length(local.steps)
+  name          = "codebuild-backend-${local.steps[count.index]}"
   badge_enabled = false
   service_role  = aws_iam_role.codebuild_container_role.arn
 
@@ -15,9 +15,7 @@ resource "aws_codebuild_project" "codebuild_backend" {
   }
   vpc_config {
     vpc_id = var.vpc_id
-
     subnets = var.subnet.private[*].id
-
     security_group_ids = [var.security_groups.task-sg.id]
   }
 
@@ -67,6 +65,37 @@ resource "aws_codebuild_project" "codebuild_backend" {
 
   source {
         type      = "CODEPIPELINE"
-        buildspec = file("${path.module}/templates/backend/buildspec_${local.backend[count.index]}.yml")
+        buildspec = file("${path.module}/templates/backend/buildspec_${local.steps[count.index]}.yml")
+  }
+}
+
+# Codebuild frontend container project
+
+resource "aws_codebuild_project" "codebuild_frontend" {
+  count         = length(local.steps)
+  name          = "codebuild-frontend-${local.steps[count.index]}"
+  badge_enabled = false
+  service_role  = aws_iam_role.codebuild_container_role.arn
+
+  artifacts {
+    type = "CODEPIPELINE"
+  }
+  vpc_config {
+    vpc_id = var.vpc_id
+    subnets = var.subnet.private[*].id
+    security_group_ids = [var.security_groups.task-sg.id]
+  }
+
+  environment {
+    compute_type                = "BUILD_GENERAL1_MEDIUM"
+    image                       = "aws/codebuild/standard:3.0"
+    type                        = "LINUX_CONTAINER"
+    privileged_mode             = true
+    image_pull_credentials_type = "CODEBUILD"
+  }
+
+  source {
+        type      = "CODEPIPELINE"
+        buildspec = file("${path.module}/templates/frontend/buildspec_${local.steps[count.index]}.yml")
   }
 }
