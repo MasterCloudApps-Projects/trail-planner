@@ -98,7 +98,7 @@ resource "aws_ecs_service" "service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups = [var.aws_security_group.task-sg.id]
+    security_groups = [var.aws_security_group.task-sg.id, var.aws_security_group.db-sg.id]
     subnets         = var.aws_subnet.private.*.id
   }
 

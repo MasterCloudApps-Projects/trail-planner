@@ -82,10 +82,10 @@ variable "security_groups" {
   description = ""
 }
 
-variable "elastic_beanstalk_app" {
+variable "static_web_bucket" {
   description = ""
 }
 
-variable "elastic_beanstalk_app_env" {
+variable "artifacts_bucket" {
   description = ""
 }

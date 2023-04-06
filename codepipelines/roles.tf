@@ -132,7 +132,7 @@ resource "aws_iam_policy" "codepipeline_policy" {
         "s3:GetBucketVersioning"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.codepipeline_bucket.arn}/*"
+      "Resource": ["${aws_s3_bucket.codepipeline_bucket.arn}/*", "${var.artifacts_bucket.arn}/*", "${var.static_web_bucket.arn}/*"]
     },
     {
       "Action" : [
@@ -159,4 +159,64 @@ EOF
 resource "aws_iam_role_policy_attachment" "codepipeline-attach" {
   role       = aws_iam_role.codepipeline_role.name
   policy_arn = aws_iam_policy.codepipeline_policy.arn
+}
+
+resource "aws_iam_role" "static_build_role" {
+  assume_role_policy = jsonencode(
+    {
+      Statement = [
+        {
+          Action = "sts:AssumeRole"
+          Effect = "Allow"
+          Principal = {
+            Service = "codebuild.amazonaws.com"
+          }
+        },
+      ]
+      Version = "2012-10-17"
+    }
+  )
+  force_detach_policies = false
+  max_session_duration  = 3600
+  name                  = "build-role-frontend"
+  path                  = "/service-role/"
+  tags                  = {}
+}
+
+resource "aws_iam_policy" "build_policy" {
+  description = "Policy used in trust relationship with CodeBuild"
+  name        = "build-policy-frontend"
+  path        = "/service-role/"
+  policy = jsonencode(
+    {
+      Statement = [
+        {
+          "Effect" = "Allow",
+          "Action" = [
+            "s3:*"
+          ],
+          "Resource" = [
+            "${var.static_web_bucket.arn}/*",
+            "${var.artifacts_bucket.arn}/*"
+          ]
+        },
+        {
+          "Action" : [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Effect" : "Allow",
+          "Resource" : "arn:aws:logs:*"
+        }
+      ]
+      Version = "2012-10-17"
+    }
+  )
+}
+
+
+resource "aws_iam_role_policy_attachment" "build_policy_attachment" {
+  role       = aws_iam_role.static_build_role.name
+  policy_arn = aws_iam_policy.build_policy.arn
 }

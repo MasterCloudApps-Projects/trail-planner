@@ -71,31 +71,45 @@ resource "aws_codebuild_project" "codebuild_backend" {
 
 # Codebuild frontend container project
 
-resource "aws_codebuild_project" "codebuild_frontend" {
-  count         = length(local.steps)
-  name          = "codebuild-frontend-${local.steps[count.index]}"
-  badge_enabled = false
-  service_role  = aws_iam_role.codebuild_container_role.arn
+resource "aws_codebuild_project" "static_web_build" {
+  badge_enabled  = false
+  build_timeout  = 60
+  name           = "static-web-build"
+  queued_timeout = 480
+  service_role   = aws_iam_role.static_build_role.arn
 
   artifacts {
-    type = "CODEPIPELINE"
-  }
-  vpc_config {
-    vpc_id = var.vpc_id
-    subnets = var.subnet.private[*].id
-    security_group_ids = [var.security_groups.task-sg.id]
+    encryption_disabled    = false
+    name                   = "static-web-build-frontend"
+    override_artifact_name = false
+    packaging              = "NONE"
+    type                   = "CODEPIPELINE"
   }
 
   environment {
     compute_type                = "BUILD_GENERAL1_MEDIUM"
-    image                       = "aws/codebuild/standard:3.0"
-    type                        = "LINUX_CONTAINER"
-    privileged_mode             = true
+    image                       = "aws/codebuild/standard:6.0"
     image_pull_credentials_type = "CODEBUILD"
+    privileged_mode             = true
+    type                        = "LINUX_CONTAINER"
+  }
+
+  logs_config {
+    cloudwatch_logs {
+      status = "ENABLED"
+    }
+
+    s3_logs {
+      encryption_disabled = false
+      status              = "DISABLED"
+    }
   }
 
   source {
-        type      = "CODEPIPELINE"
-        buildspec = file("${path.module}/templates/frontend/buildspec_${local.steps[count.index]}.yml")
+    buildspec           = file("${path.module}/templates/frontend/buildspec_build.yml")
+    git_clone_depth     = 0
+    insecure_ssl        = false
+    report_build_status = false
+    type                = "CODEPIPELINE"
   }
 }

@@ -90,87 +90,80 @@ resource "aws_codepipeline" "codepipeline-backend" {
   }
 }
 
-resource "aws_codepipeline" "codepipeline-frontend" {
-  depends_on = [
-    aws_codebuild_project.codebuild_frontend
-  ]
-  name     = "frontend-Pipeline"
+resource "aws_codepipeline" "static_web_pipeline" {
+  name     = "static-web-pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
+
   artifact_store {
-    location = aws_s3_bucket.codepipeline_bucket.bucket
+    location = var.artifacts_bucket.bucket
     type     = "S3"
   }
 
   stage {
-    name = "FrontendSource"
-    action {
-      category         = "Source"
-      name             = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
-      version          = "1"
-      output_artifacts = ["SourceFrontend"]
+    name = "Source"
 
+    action {
+      category = "Source"
       configuration = {
+        "PollForSourceChanges" = "false"
         Owner      = var.source_repo_owner
         Repo       = var.source_frontend_repo_name
         Branch     = var.source_repo_branch
         OAuthToken = var.source_repo_github_token
       }
+
+      input_artifacts = []
+      name            = "Source"
+      output_artifacts = [
+        "SourceArtifact",
+      ]
+      owner     = "ThirdParty"
+      provider  = "GitHub"
+      run_order = 1
+      version   = "1"
     }
   }
 
   stage {
-    name = "BuildTestsFrontend"
+    name = "Build"
+
     action {
-      name             = "FrontendTestsBuild"
-      category         = "Build"
-      owner            = "AWS"
-      version          = "1"
-      provider         = "CodeBuild"
-      input_artifacts  = ["SourceFrontend"]
-      run_order        = 1
+      category = "Build"
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_frontend[0].id
+        ProjectName = aws_codebuild_project.static_web_build.id
       }
+      input_artifacts = [
+        "SourceArtifact",
+      ]
+      name = "Build"
+      output_artifacts = [
+        "BuildArtifact",
+      ]
+      owner     = "AWS"
+      provider  = "CodeBuild"
+      run_order = 1
+      version   = "1"
     }
   }
 
   stage {
-    name = "BuildFrontend"
-    action {
-      name             = "FrontendBuild"
-      category         = "Build"
-      owner            = "AWS"
-      version          = "1"
-      provider         = "CodeBuild"
-      input_artifacts  = ["SourceFrontend"]
-      output_artifacts = ["BuildFrontend"]
-      run_order        = 1
-      configuration = {
-        ProjectName = aws_codebuild_project.codebuild_frontend[1].id
-      }
-    }
-  }
-
-  stage {
-    name = "DeployFrontend"
+    name = "Deploy"
 
     action {
-      name = "DeployFrontend"
       category = "Deploy"
-      owner = "AWS"
-      provider = "ElasticBeanstalk"
-      input_artifacts = ["BuildFrontend"]
-      version = "1"
-
       configuration = {
-        ApplicationName = var.elastic_beanstalk_app.name
-        EnvironmentName = var.elastic_beanstalk_app_env.name
+        "BucketName" = var.static_web_bucket.bucket
+        "Extract"    = "true"
       }
+      input_artifacts = [
+        "BuildArtifact",
+      ]
+      name             = "Deploy"
+      output_artifacts = []
+      owner            = "AWS"
+      provider         = "S3"
+      run_order        = 1
+      version          = "1"
     }
   }
 }
-
-
-

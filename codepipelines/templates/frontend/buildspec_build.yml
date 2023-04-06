@@ -5,22 +5,24 @@ phases:
     runtime-versions:
       nodejs: 16
     commands:
-      - npm install
+      - n 18
+      - npm i
+      - npm run lint
   pre_build:
     commands:
-      - echo Installing source NPM dependencies...
+      - npm i
+      - npm run type-check
+      # - npm run test:unit
   build:
     commands:
-      - echo Build started on `date`
       - npm run build
-  post_build:
-    commands:
-      - echo Build completed on `date`
+
 artifacts:
-  type: zip
   files:
-    - '**/*'
-  base-directory: 'dist'
+    - "**/*"
+  name: "dist"
+  base-directory: dist
+
 cache:
   paths:
-    - node_modules
+    - /root/.npm/**/*

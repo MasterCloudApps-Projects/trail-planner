@@ -116,3 +116,15 @@ variable "env_namespace" {
     default     = "trailplanner-dev"
     type        = string
 }
+
+variable "static_web_bucket" {
+    description = "Bucket website"
+    default     = "source-frontend-trail-planner"
+    type        = string
+}
+
+variable "artifacts_bucket" {
+    description = "Artifacts pipeline website"
+    default     = "artifacts-frontend-trail-planner"
+    type        = string
+}

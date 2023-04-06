@@ -22,13 +22,15 @@ module "rds" {
   db_user            = var.db_user
 }
 
-module elasticBeanstalk {
-  source = "./elasticBeanstalk"
+module website {
+  source = "./website"
   depends_on = [
     module.network
   ]
   subnet = module.network.aws_subnet
   vpc_id = module.network.aws_vpc_id
+  artifacts_bucket_name = var.artifacts_bucket
+  static_web_bucket_name = var.static_web_bucket
 }
 
 module ecs {
@@ -56,7 +58,7 @@ module codepipelines {
   source = "./codepipelines"
   depends_on = [
     module.ecs,
-    module.elasticBeanstalk
+    module.website
   ]
   image_backend_url = module.ecs.image_backend_url
   image_backend_arn = module.ecs.image_backend_arn
@@ -79,6 +81,6 @@ module codepipelines {
   security_groups = module.network.security_groups
   subnet = module.network.aws_subnet
   vpc_id = module.network.aws_vpc_id
-  elastic_beanstalk_app     = module.elasticBeanstalk.elastic_beanstalk_app
-  elastic_beanstalk_app_env = module.elasticBeanstalk.elastic_beanstalk_app_env
+  static_web_bucket     = module.website.static_web_bucket
+  artifacts_bucket = module.website.artifacts_bucket
 }
