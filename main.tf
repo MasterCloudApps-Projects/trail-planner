@@ -58,7 +58,8 @@ module codepipelines {
   source = "./codepipelines"
   depends_on = [
     module.ecs,
-    module.website
+    module.website,
+    module.network
   ]
   image_backend_url = module.ecs.image_backend_url
   image_backend_arn = module.ecs.image_backend_arn
@@ -83,4 +84,5 @@ module codepipelines {
   vpc_id = module.network.aws_vpc_id
   static_web_bucket     = module.website.static_web_bucket
   artifacts_bucket = module.website.artifacts_bucket
+  alb_address = module.network.alb_address
 }

@@ -105,7 +105,6 @@ resource "aws_codepipeline" "static_web_pipeline" {
     action {
       category = "Source"
       configuration = {
-        "PollForSourceChanges" = "false"
         Owner      = var.source_repo_owner
         Repo       = var.source_frontend_repo_name
         Branch     = var.source_repo_branch

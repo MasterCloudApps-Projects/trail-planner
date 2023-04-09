@@ -92,6 +92,11 @@ resource "aws_codebuild_project" "static_web_build" {
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
     type                        = "LINUX_CONTAINER"
+
+    environment_variable {
+      name = "VITE_API_HOST"
+      value = var.alb_address
+    }
   }
 
   logs_config {

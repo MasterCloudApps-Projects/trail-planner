@@ -89,3 +89,7 @@ variable "static_web_bucket" {
 variable "artifacts_bucket" {
   description = ""
 }
+
+variable "alb_address" {
+  description = ""
+}
