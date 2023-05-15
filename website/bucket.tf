@@ -1,5 +1,30 @@
 resource "aws_s3_bucket" "static_web_bucket" {
   bucket = var.static_web_bucket_name
+}
+
+resource "aws_s3_bucket_ownership_controls" "static_web_bucket_ownership" {
+  bucket = aws_s3_bucket.static_web_bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "static_web_bucket_public_access" {
+  bucket = aws_s3_bucket.static_web_bucket.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_acl" "static_web_bucket_acl" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.static_web_bucket_ownership,
+    aws_s3_bucket_public_access_block.static_web_bucket_public_access,
+  ]
+
+  bucket = aws_s3_bucket.static_web_bucket.id
   acl    = "public-read"
 }
 
@@ -26,35 +51,33 @@ resource "aws_s3_bucket_website_configuration" "s3_bucket_website_config" {
   index_document {
     suffix = "index.html"
   }
+}
 
-  error_document {
-    key = "error.html"
+
+  resource "aws_s3_bucket_policy" "allow_access_from_another_account_policy" {
+    bucket = aws_s3_bucket.static_web_bucket.id
+    policy = data.aws_iam_policy_document.allow_access_from_another_account.json
   }
-}
 
+  data "aws_iam_policy_document" "allow_access_from_another_account" {
+    statement {
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
 
-resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
-  bucket = aws_s3_bucket.static_web_bucket.id
-  policy = data.aws_iam_policy_document.allow_access_from_another_account.json
-}
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:PutObject",
+        "s3:GetBucketVersioning",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy"
+      ]
 
-data "aws_iam_policy_document" "allow_access_from_another_account" {
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
+      resources = [
+        "${aws_s3_bucket.static_web_bucket.arn}/*",
+        aws_s3_bucket.static_web_bucket.arn
+      ]
     }
-
-    actions = [
-      "s3:GetObject",
-      "s3:GetObjectVersion",
-      "s3:PutObject",
-      "s3:GetBucketVersioning"
-    ]
-
-    resources = [
-      "${aws_s3_bucket.static_web_bucket.arn}/*",
-      aws_s3_bucket.static_web_bucket.arn
-    ]
   }
-}

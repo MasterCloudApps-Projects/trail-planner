@@ -2,7 +2,6 @@
 
 resource "aws_s3_bucket" "codepipeline_bucket" {
   bucket = "codepipeline-general-bucket"
-  acl    = "private"
 }
 
 # AWS Codepipeline

@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "db-subnet-grp" {
 
 resource "aws_db_parameter_group" "bd-parameter-group" {
   name   = "trailplanner"
-  family = "postgres13"
+  family = "postgres14"
 
   parameter {
     name  = "log_connections"
