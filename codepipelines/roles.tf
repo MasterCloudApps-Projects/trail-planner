@@ -1,4 +1,6 @@
-# Codebuild container role
+# ---------------------------------------------------------------------------------------------------------------------
+# CODEBUILD CONTAINER ROLE
+# ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_iam_role" "codebuild_container_role" {
   assume_role_policy = <<EOF
@@ -100,6 +102,10 @@ resource "aws_iam_role_policy_attachment" "codebuild-container-attach" {
   policy_arn = aws_iam_policy.codebuild_container_policy.arn
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# CODEPIPELINE CONTAINER ROLE
+# ---------------------------------------------------------------------------------------------------------------------
+
 resource "aws_iam_role" "codepipeline_role" {
   assume_role_policy = <<EOF
 {
@@ -160,6 +166,10 @@ resource "aws_iam_role_policy_attachment" "codepipeline-attach" {
   role       = aws_iam_role.codepipeline_role.name
   policy_arn = aws_iam_policy.codepipeline_policy.arn
 }
+
+# ---------------------------------------------------------------------------------------------------------------------
+# STATIC WEB BUILD ROLE
+# ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_iam_role" "static_build_role" {
   assume_role_policy = jsonencode(

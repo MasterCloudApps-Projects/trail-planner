@@ -1,4 +1,6 @@
-# Global
+# ---------------------------------------------------------------------------------------------------------------------
+# GLOBAL
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "aws_region" {
   description = "The AWS region to create things in"
@@ -9,7 +11,21 @@ variable "aws_profile" {
   description = "AWS profile"
 }
 
+variable "terraform_ver" {
+    description = "Terraform Version number for passing it"
+    default     = "1.2.2"
+    type        = string
+}
+
+variable "env_namespace" {
+    description = "Namespace env deply lambdas"
+    default     = "trailplanner-dev"
+    type        = string
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
 # VPC
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "vpc_cidr" {
   description = "CIDR for the VPC"
@@ -21,21 +37,27 @@ variable "az_count" {
   default     = "2"
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
 # ECR
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "image_repo_name" {
     description = "Image repo name"
     type = string
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
 # ECS
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "container_port" {
   description = "Port exposed by the docker image to redirect traffic to"
   default     = 8080
 }
 
-# Repo name and branch
+# ---------------------------------------------------------------------------------------------------------------------
+# GITHUB
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "source_backend_repo_name" {
     description = "Source repo name"
@@ -62,7 +84,9 @@ variable "source_repo_github_token" {
     type = string
 }
 
-# Codebuild
+# ---------------------------------------------------------------------------------------------------------------------
+# CODEBUILD
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "family" {
   description = "Family of the Task Definition"
@@ -70,11 +94,13 @@ variable "family" {
 }
 
 variable "stack" {
-  description = "Name of the stack."
+  description = "Name of the stack"
   default     = "TrailPlanner"
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
 # RDS
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "db_profile" {
   description = "RDS Profile"
@@ -105,17 +131,9 @@ variable "db_password" {
   description = "RDS DB password"
 }
 
-variable "terraform_ver" {
-    description = "Terraform Version number for passing it to codebuild"
-    default     = "1.2.2"
-    type        = string
-}
-
-variable "env_namespace" {
-    description = "Namespace env deply lambdas"
-    default     = "trailplanner-dev"
-    type        = string
-}
+# ---------------------------------------------------------------------------------------------------------------------
+# S3 FRONTEND
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable "static_web_bucket" {
     description = "Bucket website"
